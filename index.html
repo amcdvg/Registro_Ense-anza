@@ -256,22 +256,96 @@
             border: 3px solid white; /* Opcional: borde blanco */
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Opcional: sombra */
         }
+        
+        /* Nuevos estilos para los botones de navegación */
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .nav-button {
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .nav-button.primary {
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+        
+        .nav-button.secondary {
+            background-color: white;
+            color: var(--primary-color);
+        }
+        
+        .nav-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-button i {
+            margin-right: 8px;
+        }
+        
+        /* Estilos para la sección de edición */
+        .edit-section {
+            display: none;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .edit-form {
+            margin-top: 15px;
+        }
+        
+        .edit-result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        .nav-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin: 20px 0; /* Añade 20px de margen arriba y abajo */
+        padding-top: 20px; /* Espacio adicional arriba si lo prefieres */
+    }
     </style>
 </head>
 <body>
     <div class="container">
-        <!--div class="form-header">
-            <i class="fas fa-chalkboard-teacher"></i>
-            <h1>Cronograma de Enseñanzas</h1>
-            <p>Sistema de agendamiento de predicaciones</p>
-        </div-->
         <div class="form-header">
-            <!-- Reemplaza el ícono por una imagen -->
             <img src="./descarga.png" alt="Enseñanzas" class="header-image">
             <h1>Cronograma de Enseñanzas</h1>
             <p>Sistema de agendamiento de predicaciones</p>
         </div>
-        <div class="form-body">
+        
+        <!-- Botones de navegación -->
+        <div class="nav-buttons">
+            <button id="registroBtn" class="nav-button primary">
+                <i class="fas fa-plus-circle"></i> Registro
+            </button>
+            <button id="editarBtn" class="nav-button secondary">
+                <i class="fas fa-edit"></i> Editar
+            </button>
+        </div>
+        
+        <!-- Sección de Registro (formulario original) -->
+        <div id="registroSection" class="form-body">
             <form id="enseñanzaForm">
                 <!-- Selector de Mes y Semana -->
                 <div class="month-week-selector">
@@ -374,6 +448,38 @@
                 <button type="submit" class="btn"><i class="fas fa-paper-plane"></i> Guardar Registro</button>
             </form>
         </div>
+        
+        <!-- Sección de Edición -->
+        <div id="editarSection" class="edit-section">
+            <h3><i class="fas fa-search"></i> Buscar Registro por Fecha</h3>
+            <div class="edit-form">
+                <div class="form-group">
+                    <label for="fechaBusqueda">Seleccione una fecha</label>
+                    <i class="fas fa-calendar-day input-icon"></i>
+                    <input type="date" id="fechaBusqueda" class="form-control">
+                </div>
+                <button id="buscarBtn" class="btn"><i class="fas fa-search"></i> Buscar</button>
+            </div>
+            
+            <div id="resultadoBusqueda" class="edit-result" style="display: none;">
+                <h4><i class="fas fa-info-circle"></i> Resultado de la búsqueda</h4>
+                <div id="datosEncontrados"></div>
+                
+                <div class="form-group" id="editarPredicacionDomingoContainer" style="display: none;">
+                    <label for="editarPredicacionDomingo">PREDICACIÓN DOMINGO</label>
+                    <i class="fas fa-book input-icon"></i>
+                    <input type="text" id="editarPredicacionDomingo" class="form-control">
+                </div>
+                
+                <div class="form-group" id="editarPredicacionMiercolesContainer" style="display: none;">
+                    <label for="editarPredicacionMiercoles">PREDICACIÓN MIÉRCOLES</label>
+                    <i class="fas fa-book input-icon"></i>
+                    <input type="text" id="editarPredicacionMiercoles" class="form-control">
+                </div>
+                
+                <button id="guardarCambiosBtn" class="btn" style="display: none;"><i class="fas fa-save"></i> Guardar Cambios</button>
+            </div>
+        </div>
     </div>
     
     <div class="loading" id="loading">
@@ -385,7 +491,7 @@
 
     <script>
         // Configuración de Google Sheets
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyUIDcvfO7jJN2RsTlJfHUXpX8AEUktct7fZdfszBKKfMuAEt7XnmgZCeYgo9s0Z6JL/exec'; // Reemplaza con tu URL de Apps Script
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby0S64XdQcvJOKcKx-OvJ7tvKbClaR7aX3XjD_kw8L477CEPltCxe4GpjTuTUpoYD0w/exec'; // Reemplaza con tu URL de Apps Script
         
         // Función para mostrar loading
         function showLoading() {
@@ -466,6 +572,71 @@
                 return result;
             } catch (error) {
                 console.error("Error al guardar registro:", error);
+                hideLoading();
+                throw error;
+            }
+        }
+        
+        // Función para buscar registros por fecha
+        async function buscarRegistrosPorFecha(fecha) {
+            try {
+                showLoading();
+                
+                const response = await fetch(`${SCRIPT_URL}?action=obtenerPredicaciones`);
+                
+                if (!response.ok) {
+                    throw new Error('Error al buscar registros');
+                }
+                
+                const data = await response.json();
+                
+                hideLoading();
+                
+                if (data.success && data.data) {
+                    // Buscar registros que coincidan con la fecha
+                    const registrosEncontrados = data.data.filter(registro => {
+                        return registro.fechaDomingo === fecha || 
+                               registro.fechaMiercoles === fecha || 
+                               registro.fechaCulto === fecha;
+                    });
+                    
+                    return registrosEncontrados;
+                }
+                
+                return [];
+            } catch (error) {
+                console.error("Error al buscar registros:", error);
+                hideLoading();
+                throw error;
+            }
+        }
+        
+        // Función para actualizar un registro
+        async function actualizarRegistro(fecha, campo, nuevoValor) {
+            try {
+                showLoading();
+                
+                const dataToSend = {
+                    action: 'actualizarRegistro',
+                    fecha: fecha,
+                    campo: campo,
+                    nuevoValor: nuevoValor
+                };
+                
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `data=${encodeURIComponent(JSON.stringify(dataToSend))}`
+                });
+                
+                const result = await response.json();
+                
+                hideLoading();
+                return result;
+            } catch (error) {
+                console.error("Error al actualizar registro:", error);
                 hideLoading();
                 throw error;
             }
@@ -589,6 +760,237 @@
             // Manejar cambio de mes
             const selectMonth = document.getElementById('selectMonth');
             const selectWeek = document.getElementById('selectWeek');
+            
+            // Elementos de la sección de edición
+            const registroBtn = document.getElementById('registroBtn');
+            const editarBtn = document.getElementById('editarBtn');
+            const registroSection = document.getElementById('registroSection');
+            const editarSection = document.getElementById('editarSection');
+            const fechaBusqueda = document.getElementById('fechaBusqueda');
+            const buscarBtn = document.getElementById('buscarBtn');
+            const resultadoBusqueda = document.getElementById('resultadoBusqueda');
+            const datosEncontrados = document.getElementById('datosEncontrados');
+            const editarPredicacionDomingo = document.getElementById('editarPredicacionDomingo');
+            const editarPredicacionMiercoles = document.getElementById('editarPredicacionMiercoles');
+            const editarPredicacionDomingoContainer = document.getElementById('editarPredicacionDomingoContainer');
+            const editarPredicacionMiercolesContainer = document.getElementById('editarPredicacionMiercolesContainer');
+            const guardarCambiosBtn = document.getElementById('guardarCambiosBtn');
+            
+            // Mostrar sección de registro por defecto
+            registroSection.style.display = 'block';
+            editarSection.style.display = 'none';
+            
+            // Manejar clic en botón de registro
+            registroBtn.addEventListener('click', function() {
+                registroSection.style.display = 'block';
+                editarSection.style.display = 'none';
+                registroBtn.classList.add('primary');
+                registroBtn.classList.remove('secondary');
+                editarBtn.classList.add('secondary');
+                editarBtn.classList.remove('primary');
+            });
+            
+            // Manejar clic en botón de edición
+            editarBtn.addEventListener('click', function() {
+                registroSection.style.display = 'none';
+                editarSection.style.display = 'block';
+                registroBtn.classList.add('secondary');
+                registroBtn.classList.remove('primary');
+                editarBtn.classList.add('primary');
+                editarBtn.classList.remove('secondary');
+            });
+            
+            // Manejar búsqueda por fecha
+            buscarBtn.addEventListener('click', async function() {
+                if (!fechaBusqueda.value) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Por favor seleccione una fecha para buscar',
+                        confirmButtonColor: '#4361ee'
+                    });
+                    return;
+                }
+                
+                try {
+                    const registros = await buscarRegistrosPorFecha(fechaBusqueda.value);
+                    
+                    if (registros.length === 0) {
+                        datosEncontrados.innerHTML = '<p>No se encontraron registros para esta fecha.</p>';
+                        resultadoBusqueda.style.display = 'block';
+                        editarPredicacionDomingoContainer.style.display = 'none';
+                        editarPredicacionMiercolesContainer.style.display = 'none';
+                        guardarCambiosBtn.style.display = 'none';
+                        return;
+                    }
+                    
+                    // Mostrar resultados
+                    let html = '';
+                    registros.forEach(registro => {
+                        html += '<div style="margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px;">';
+                        
+                        if (registro.fechaDomingo === fechaBusqueda.value && registro.predicacionDomingo) {
+                            html += `
+                                <p><strong>Domingo:</strong> ${registro.predicacionDomingo}</p>
+                                <button class="btn editar-domingo" style="margin-top: 5px; padding: 5px 10px; font-size: 14px;" 
+                                    data-fecha="${registro.fechaDomingo}" 
+                                    data-valor="${registro.predicacionDomingo}">
+                                    <i class="fas fa-edit"></i> Editar
+                                </button>
+                            `;
+                        }
+                        
+                        if (registro.fechaMiercoles === fechaBusqueda.value && registro.predicacionMiercoles) {
+                            html += `
+                                <p><strong>Miércoles:</strong> ${registro.predicacionMiercoles}</p>
+                                <button class="btn editar-miercoles" style="margin-top: 5px; padding: 5px 10px; font-size: 14px;" 
+                                    data-fecha="${registro.fechaMiercoles}" 
+                                    data-valor="${registro.predicacionMiercoles}">
+                                    <i class="fas fa-edit"></i> Editar
+                                </button>
+                            `;
+                        }
+                        
+                        if (registro.fechaCulto === fechaBusqueda.value) {
+                            html += `<p><strong>Culto Sábado:</strong> ${registro.horarioCulto}</p>`;
+                        }
+                        
+                        html += '</div>';
+                    });
+                    
+                    datosEncontrados.innerHTML = html;
+                    resultadoBusqueda.style.display = 'block';
+                    
+                    // Configurar eventos para los botones de edición
+                    document.querySelectorAll('.editar-domingo').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const fecha = this.getAttribute('data-fecha');
+                            const valor = this.getAttribute('data-valor');
+                            
+                            editarPredicacionDomingo.value = valor;
+                            editarPredicacionDomingoContainer.style.display = 'block';
+                            editarPredicacionMiercolesContainer.style.display = 'none';
+                            guardarCambiosBtn.style.display = 'block';
+                            
+                            // Configurar el botón de guardar para esta edición
+                            guardarCambiosBtn.onclick = async function() {
+                                try {
+                                    const resultado = await actualizarRegistro(
+                                        fecha, 
+                                        'PREDICACION DOMINGO', 
+                                        editarPredicacionDomingo.value
+                                    );
+                                    
+                                    if (resultado.success) {
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: 'Actualizado',
+                                            html: `
+                                            <p>La enseñanza <strong>"${editarPredicacionDomingo.value}"</strong> para la fecha <strong>"${fecha}"</strong>  fue actualizada correctamente.</p>
+                                            
+                                        `,
+                                            confirmButtonColor: '#4361ee'
+                                        });
+                                        
+                                        // Actualizar el botón con el nuevo valor
+                                        btn.setAttribute('data-valor', editarPredicacionDomingo.value);
+                                        btn.previousElementSibling.innerHTML = `<strong>Domingo:</strong> ${editarPredicacionDomingo.value}`;
+                                        
+                                        // Limpiar todos los campos
+                                        fechaBusqueda.value = '';
+                                        editarPredicacionDomingo.value = '';
+                                        editarPredicacionMiercoles.value = '';
+                                        datosEncontrados.innerHTML = '';
+                                        
+                                        // Ocultar campos de edición
+                                        editarPredicacionDomingoContainer.style.display = 'none';
+                                        editarPredicacionMiercolesContainer.style.display = 'none';
+                                        guardarCambiosBtn.style.display = 'none';
+                                        resultadoBusqueda.style.display = 'none';
+                                    } else {
+                                        throw new Error(resultado.error || 'Error desconocido');
+                                    }
+                                } catch (error) {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: 'No se pudo actualizar la predicación: ' + error.message,
+                                        confirmButtonColor: '#4361ee'
+                                    });
+                                }
+                            };
+                        });
+                    });
+                    
+                    document.querySelectorAll('.editar-miercoles').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const fecha = this.getAttribute('data-fecha');
+                            const valor = this.getAttribute('data-valor');
+                            
+                            editarPredicacionMiercoles.value = valor;
+                            editarPredicacionMiercolesContainer.style.display = 'block';
+                            editarPredicacionDomingoContainer.style.display = 'none';
+                            guardarCambiosBtn.style.display = 'block';
+                            
+                            // Configurar el botón de guardar para esta edición
+                            guardarCambiosBtn.onclick = async function() {
+                                try {
+                                    const resultado = await actualizarRegistro(
+                                        fecha, 
+                                        'PREDICACION MIERCOLES', 
+                                        editarPredicacionMiercoles.value
+                                    );
+                                    
+                                    if (resultado.success) {
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: 'Actualizado',
+                                            html: `
+                                            <p>La enseñanza <strong>"${editarPredicacionMiercoles.value}"</strong> para la fecha <strong>"${fecha}"</strong>  fue actualizada correctamente.</p>
+                                            
+                                        `,
+                                            confirmButtonColor: '#4361ee'
+                                        });
+                                        
+                                        // Actualizar el botón con el nuevo valor
+                                        btn.setAttribute('data-valor', editarPredicacionMiercoles.value);
+                                        btn.previousElementSibling.innerHTML = `<strong>Miércoles:</strong> ${editarPredicacionMiercoles.value}`;
+                                        
+                                        // Limpiar todos los campos
+                                        fechaBusqueda.value = '';
+                                        editarPredicacionDomingo.value = '';
+                                        editarPredicacionMiercoles.value = '';
+                                        datosEncontrados.innerHTML = '';
+                                        
+                                        // Ocultar campos de edición
+                                        editarPredicacionDomingoContainer.style.display = 'none';
+                                        editarPredicacionMiercolesContainer.style.display = 'none';
+                                        guardarCambiosBtn.style.display = 'none';
+                                        resultadoBusqueda.style.display = 'none';
+                                    } else {
+                                        throw new Error(resultado.error || 'Error desconocido');
+                                    }
+                                } catch (error) {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: 'No se pudo actualizar la predicación: ' + error.message,
+                                        confirmButtonColor: '#4361ee'
+                                    });
+                                }
+                            };
+                        });
+                    });
+                    
+                } catch (error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'No se pudo realizar la búsqueda: ' + error.message,
+                        confirmButtonColor: '#4361ee'
+                    });
+                }
+            });
             
             if (selectMonth) {
                 selectMonth.addEventListener('change', function() {
@@ -748,115 +1150,114 @@
             }
             
             // Verificar predicación domingo en Google Sheets
-// Verificar predicación domingo en Google Sheets
-const predicacionDomingo = document.getElementById('predicacionDomingo');
-if (predicacionDomingo) {
-    predicacionDomingo.addEventListener('blur', async function() {
-        const predicacion = this.value.trim();
-        const fechaInput = document.getElementById('fechaEnseñanzaDomingo');
-        const fecha = fechaInput ? fechaInput.value : '';
-        
-        if (predicacion && fecha) {
-            try {
-                // Definir las dos expresiones regulares a comparar
-                const regexEnsenanza = /Enseñanza con nuestra Hermana Mar[ií]a Luisa/i;
-               
-                // Validar solo si NO coincide con NINGUNA de las dos regex
-                if (!regexEnsenanza.test(predicacion) ) {
-                    const validacion = await validarPredicacion(predicacion, fecha, 'ambos');
+            const predicacionDomingo = document.getElementById('predicacionDomingo');
+            if (predicacionDomingo) {
+                predicacionDomingo.addEventListener('blur', async function() {
+                    const predicacion = this.value.trim();
+                    const fechaInput = document.getElementById('fechaEnseñanzaDomingo');
+                    const fecha = fechaInput ? fechaInput.value : '';
                     
-                    const statsDiv = document.getElementById('statsPredicacionDomingo');
-                    const statsText = document.getElementById('statsTextDomingo');
-                    
-                    if (statsDiv && statsText) {
-                        if (validacion.existe) {
-                            statsText.innerHTML = `
-                                Esta enseñanza se ha predicado <strong>${validacion.count} veces</strong> este año.<br>
-                                Fechas anteriores:<ul style="margin-top:5px; padding-left:20px;">
-                                    ${validacion.fechas.map(fecha => `<li>${fecha}</li>`).join('')}
-                                </ul>
-                            `;
-                            statsDiv.style.display = 'block';
-                            
-                            // Mostrar advertencia si ya existe
-                            Swal.fire({
-                                icon: 'warning',
-                                title: 'Enseñanza predicada anteriormente',
-                                html: `
-                                    <p>La enseñanza <strong>"${predicacion}"</strong> ya ha sido predicada este año.</p>
-                                    <p>Fechas anteriores:</p>
-                                    <ul style="padding-left: 20px; margin: 5px 0;">
-                                        ${validacion.fechas.map(fecha => `<li>${fecha}</li>`).join('')}
-                                    </ul>
-                                `,
-                                confirmButtonColor: '#4361ee'
-                            });
-                        } else {
-                            statsText.textContent = 'Esta es la primera vez que se registra esta predicación este año.';
-                            statsDiv.style.display = 'block';
+                    if (predicacion && fecha) {
+                        try {
+                            // Definir las dos expresiones regulares a comparar
+                            const regexEnsenanza = /Enseñanza con nuestra Hermana Mar[ií]a Luisa/i;
+                           
+                            // Validar solo si NO coincide con NINGUNA de las dos regex
+                            if (!regexEnsenanza.test(predicacion) ) {
+                                const validacion = await validarPredicacion(predicacion, fecha, 'ambos');
+                                
+                                const statsDiv = document.getElementById('statsPredicacionDomingo');
+                                const statsText = document.getElementById('statsTextDomingo');
+                                
+                                if (statsDiv && statsText) {
+                                    if (validacion.existe) {
+                                        statsText.innerHTML = `
+                                            Esta enseñanza se ha predicado <strong>${validacion.count} veces</strong> este año.<br>
+                                            Fechas anteriores:<ul style="margin-top:5px; padding-left:20px;">
+                                                ${validacion.fechas.map(fecha => `<li>${fecha}</li>`).join('')}
+                                            </ul>
+                                        `;
+                                        statsDiv.style.display = 'block';
+                                        
+                                        // Mostrar advertencia si ya existe
+                                        Swal.fire({
+                                            icon: 'warning',
+                                            title: 'Enseñanza predicada anteriormente',
+                                            html: `
+                                                <p>La enseñanza <strong>"${predicacion}"</strong> ya ha sido predicada este año.</p>
+                                                <p>Fechas anteriores:</p>
+                                                <ul style="padding-left: 20px; margin: 5px 0;">
+                                                    ${validacion.fechas.map(fecha => `<li>${fecha}</li>`).join('')}
+                                                </ul>
+                                            `,
+                                            confirmButtonColor: '#4361ee'
+                                        });
+                                    } else {
+                                        statsText.textContent = 'Esta es la primera vez que se registra esta predicación este año.';
+                                        statsDiv.style.display = 'block';
+                                    }
+                                }
+                            }
+                        } catch (error) {
+                            console.error('Error al verificar predicación dominical:', error);
                         }
                     }
-                }
-            } catch (error) {
-                console.error('Error al verificar predicación dominical:', error);
+                });
             }
-        }
-    });
-}
 
-// Verificar predicación miércoles (similar al anterior)
-const predicacionMiercoles = document.getElementById('predicacionMiercoles');
-if (predicacionMiercoles) {
-    predicacionMiercoles.addEventListener('blur', async function() {
-        const predicacion = this.value.trim();
-        const fechaInput = document.getElementById('fechaEnseñanzaMiercoles');
-        const fecha = fechaInput ? fechaInput.value : '';
-        
-        if (predicacion && fecha) {
-            try {
-                const regexEnsenanza = /Enseñanza con nuestra Hermana Mar[ií]a Luisa/i;
-                 // Cambia esto por tu segunda regex
-                
-                if (!regexEnsenanza.test(predicacion)) {
-                    const validacion = await validarPredicacion(predicacion, fecha, 'ambos');
+            // Verificar predicación miércoles (similar al anterior)
+            const predicacionMiercoles = document.getElementById('predicacionMiercoles');
+            if (predicacionMiercoles) {
+                predicacionMiercoles.addEventListener('blur', async function() {
+                    const predicacion = this.value.trim();
+                    const fechaInput = document.getElementById('fechaEnseñanzaMiercoles');
+                    const fecha = fechaInput ? fechaInput.value : '';
                     
-                    const statsDiv = document.getElementById('statsPredicacionMiercoles');
-                    const statsText = document.getElementById('statsTextMiercoles');
-                    
-                    if (statsDiv && statsText) {
-                        if (validacion.existe) {
-                            statsText.innerHTML = `
-                                Esta enseñanza se ha predicado <strong>${validacion.count} veces</strong> este año (sumando domingos y miércoles).<br>
-                                Fechas anteriores:<ul style="margin-top:5px; padding-left:20px;">
-                                    ${validacion.fechas.map(fecha => `<li>${fecha}</li>`).join('')}
-                                </ul>
-                            `;
-                            statsDiv.style.display = 'block';
+                    if (predicacion && fecha) {
+                        try {
+                            const regexEnsenanza = /Enseñanza con nuestra Hermana Mar[ií]a Luisa/i;
+                             // Cambia esto por tu segunda regex
                             
-                            Swal.fire({
-                                icon: 'warning',
-                                title: 'Enseñanza predicada anteriormente',
-                                html: `
-                                    <p>La enseñanza <strong>"${predicacion}"</strong> ya ha sido predicada este año (sumando domingos y miércoles).</p>
-                                    <p>Fechas anteriores:</p>
-                                    <ul style="padding-left: 20px; margin: 5px 0;">
-                                        ${validacion.fechas.map(fecha => `<li>${fecha}</li>`).join('')}
-                                    </ul>
-                                `,
-                                confirmButtonColor: '#4361ee'
-                            });
-                        } else {
-                            statsText.textContent = 'Esta es la primera vez que se registra esta enseñanza este año.';
-                            statsDiv.style.display = 'block';
+                            if (!regexEnsenanza.test(predicacion)) {
+                                const validacion = await validarPredicacion(predicacion, fecha, 'ambos');
+                                
+                                const statsDiv = document.getElementById('statsPredicacionMiercoles');
+                                const statsText = document.getElementById('statsTextMiercoles');
+                                
+                                if (statsDiv && statsText) {
+                                    if (validacion.existe) {
+                                        statsText.innerHTML = `
+                                            Esta enseñanza se ha predicado <strong>${validacion.count} veces</strong> este año (sumando domingos y miércoles).<br>
+                                            Fechas anteriores:<ul style="margin-top:5px; padding-left:20px;">
+                                                ${validacion.fechas.map(fecha => `<li>${fecha}</li>`).join('')}
+                                            </ul>
+                                        `;
+                                        statsDiv.style.display = 'block';
+                                        
+                                        Swal.fire({
+                                            icon: 'warning',
+                                            title: 'Enseñanza predicada anteriormente',
+                                            html: `
+                                                <p>La enseñanza <strong>"${predicacion}"</strong> ya ha sido predicada este año (sumando domingos y miércoles).</p>
+                                                <p>Fechas anteriores:</p>
+                                                <ul style="padding-left: 20px; margin: 5px 0;">
+                                                    ${validacion.fechas.map(fecha => `<li>${fecha}</li>`).join('')}
+                                                </ul>
+                                            `,
+                                            confirmButtonColor: '#4361ee'
+                                        });
+                                    } else {
+                                        statsText.textContent = 'Esta es la primera vez que se registra esta enseñanza este año.';
+                                        statsDiv.style.display = 'block';
+                                    }
+                                }
+                            }
+                        } catch (error) {
+                            console.error('Error al verificar predicación:', error);
                         }
                     }
-                }
-            } catch (error) {
-                console.error('Error al verificar predicación:', error);
+                });
             }
-        }
-    });
-}
             
             // Manejar envío del formulario
             const enseñanzaForm = document.getElementById('enseñanzaForm');
