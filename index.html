@@ -335,12 +335,16 @@
         </div>
         
         <!-- Botones de navegación -->
+        <!-- Botones de navegación -->
         <div class="nav-buttons">
             <button id="registroBtn" class="nav-button primary">
                 <i class="fas fa-plus-circle"></i> Registro
             </button>
             <button id="editarBtn" class="nav-button secondary">
                 <i class="fas fa-edit"></i> Editar
+            </button>
+            <button id="buscarPredicacionBtn" class="nav-button secondary">
+                <i class="fas fa-search"></i> Buscar Enseñanza
             </button>
         </div>
         
@@ -478,6 +482,24 @@
                 </div>
                 
                 <button id="guardarCambiosBtn" class="btn" style="display: none;"><i class="fas fa-save"></i> Guardar Cambios</button>
+            </div>
+        </div>
+
+        <!-- Sección de Búsqueda de Enseñanza -->
+        <div id="buscarPredicacionSection" class="edit-section" style="display: none;">
+            <h3><i class="fas fa-search"></i> Buscar Enseñanza por Número y Nombre</h3>
+            <div class="edit-form">
+                <div class="form-group">
+                    <label for="buscarPredicacionInput">NÚMERO Y NOMBRE DE ENSEÑANZA</label>
+                    <i class="fas fa-book input-icon"></i>
+                    <input type="text" id="buscarPredicacionInput" class="form-control" placeholder="Ej: 1017 DIOS LE HABLA AL HOMBRE">
+                </div>
+                <button id="buscarPredicacionBtnConfirmar" class="btn"><i class="fas fa-search"></i> Buscar</button>
+            </div>
+            
+            <div id="resultadoBusquedaPredicacion" class="edit-result" style="display: none;">
+                <h4><i class="fas fa-info-circle"></i> Resultado de la búsqueda</h4>
+                <div id="datosEncontradosPredicacion"></div>
             </div>
         </div>
     </div>
@@ -780,20 +802,168 @@
             registroSection.style.display = 'block';
             editarSection.style.display = 'none';
             
+            // Elementos para la búsqueda de enseñanza
+            const buscarPredicacionBtn = document.getElementById('buscarPredicacionBtn');
+            const buscarPredicacionSection = document.getElementById('buscarPredicacionSection');
+            const buscarPredicacionInput = document.getElementById('buscarPredicacionInput');
+            const buscarPredicacionBtnConfirmar = document.getElementById('buscarPredicacionBtnConfirmar');
+            const resultadoBusquedaPredicacion = document.getElementById('resultadoBusquedaPredicacion');
+            const datosEncontradosPredicacion = document.getElementById('datosEncontradosPredicacion');
+
+            // Manejar clic en botón de búsqueda de enseñanza
+            buscarPredicacionBtn.addEventListener('click', function() {
+                registroSection.style.display = 'none';
+                editarSection.style.display = 'none';
+                buscarPredicacionSection.style.display = 'block';
+                
+                // Actualizar estilos de botones
+                registroBtn.classList.add('secondary');
+                registroBtn.classList.remove('primary');
+                editarBtn.classList.add('secondary');
+                editarBtn.classList.remove('primary');
+                buscarPredicacionBtn.classList.add('primary');
+                buscarPredicacionBtn.classList.remove('secondary');
+            });
+
+            // Manejar búsqueda de enseñanza
+            buscarPredicacionBtnConfirmar.addEventListener('click', async function() {
+                const predicacion = buscarPredicacionInput.value.trim();
+                
+                if (!predicacion) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Por favor ingrese el número y nombre de la enseñanza',
+                        confirmButtonColor: '#4361ee'
+                    });
+                    return;
+                }
+                
+                try {
+                    showLoading();
+
+                    // Obtener el año actual
+                    const añoActual = new Date().getFullYear();
+                    let resultadosAcumulados = {
+                        existe: false,
+                        count: 0,
+                        fechas: []
+                    };
+
+                    // Bucle para los últimos 10 años (desde el actual hacia atrás)
+                    for (let año = añoActual; año >= añoActual - 5; año--) {
+                        try {
+                            // Hacer la petición a Google Apps Script para cada año
+                            const response = await fetch(`${SCRIPT_URL}?action=validarPredicacion&predicacion=${encodeURIComponent(predicacion)}&año=${año}&tipo=ambos`);
+                            
+                            if (!response.ok) {
+                                console.error(`Error al buscar enseñanza para el año ${año}`);
+                                continue; // Continuar con el siguiente año si hay error
+                            }
+                            
+                            const validacion = await response.json();
+                            
+                            // Acumular resultados
+                            if (validacion.existe) {
+                                resultadosAcumulados.existe = true;
+                                resultadosAcumulados.count += validacion.count;
+                                resultadosAcumulados.fechas.push(...validacion.fechas.map(fecha => `${fecha} (${año})`));
+                            }
+                        } catch (error) {
+                            console.error(`Error procesando año ${año}:`, error);
+                        }
+                    }
+
+                    hideLoading();
+
+                    // Mostrar resultados acumulados
+                    resultadoBusquedaPredicacion.style.display = 'block';
+
+                    if (resultadosAcumulados.existe) {
+                        datosEncontradosPredicacion.innerHTML = `
+                            <p><strong>Enseñanza encontrada:</strong> ${predicacion}</p>
+                            <p>Esta enseñanza se ha predicado <strong>${resultadosAcumulados.count} veces</strong>.</p>
+                            <p>Fechas anteriores:</p>
+                            <ul style="padding-left: 20px; margin-top: 5px;">
+                                ${resultadosAcumulados.fechas.map(fecha => `<li>${fecha}</li>`).join('')}
+                            </ul>
+                        `;
+                        
+                        /*Swal.fire({
+                            icon: 'warning',
+                            title: 'Enseñanza predicada anteriormente',
+                            html: `
+                                <p>La enseñanza <strong>"${predicacion}"</strong> ha sido predicada ${resultadosAcumulados.count} veces en los últimos 10 años.</p>
+                                <p>Fechas anteriores:</p>
+                                <ul style="padding-left: 20px; margin: 5px 0;">
+                                    ${resultadosAcumulados.fechas.map(fecha => `<li>${fecha}</li>`).join('')}
+                                </ul>
+                            `,
+                            confirmButtonColor: '#4361ee'
+                        });*/
+                    } else {
+                        datosEncontradosPredicacion.innerHTML = `
+                            <p><strong>Enseñanza:</strong> ${predicacion}</p>
+                            <p>Esta es la primera vez que se registra esta enseñanza en los últimos 10 años.</p>
+                        `;
+                        
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Enseñanza no encontrada',
+                            text: 'Esta es la primera vez que se registra esta enseñanza en los últimos 10 años.',
+                            confirmButtonColor: '#4361ee'
+                        });
+                    }
+                } catch (error) {
+                    hideLoading();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'No se pudo realizar la búsqueda: ' + error.message,
+                        confirmButtonColor: '#4361ee'
+                    });
+                }
+            });
+            // Manejar clic en botón de registro
+            // En la sección de configuración inicial (dentro del DOMContentLoaded), añade esto:
+
+            // Manejar clic en botón de registro - Limpiar búsqueda
             // Manejar clic en botón de registro
             registroBtn.addEventListener('click', function() {
+                // Limpiar búsqueda y desmarcar botón "Buscar Enseñanza"
+                buscarPredicacionInput.value = '';
+                resultadoBusquedaPredicacion.style.display = 'none';
+                datosEncontradosPredicacion.innerHTML = '';
+                buscarPredicacionBtn.classList.remove('primary'); // Quitar estilo "primary"
+                buscarPredicacionBtn.classList.add('secondary');  // Aplicar estilo "secondary"
+                
+                // Mostrar sección de registro
                 registroSection.style.display = 'block';
                 editarSection.style.display = 'none';
+                buscarPredicacionSection.style.display = 'none';
+                
+                // Actualizar estilos de los botones
                 registroBtn.classList.add('primary');
                 registroBtn.classList.remove('secondary');
                 editarBtn.classList.add('secondary');
                 editarBtn.classList.remove('primary');
             });
-            
+
             // Manejar clic en botón de edición
             editarBtn.addEventListener('click', function() {
+                // Limpiar búsqueda y desmarcar botón "Buscar Enseñanza"
+                buscarPredicacionInput.value = '';
+                resultadoBusquedaPredicacion.style.display = 'none';
+                datosEncontradosPredicacion.innerHTML = '';
+                buscarPredicacionBtn.classList.remove('primary'); // Quitar estilo "primary"
+                buscarPredicacionBtn.classList.add('secondary');  // Aplicar estilo "secondary"
+                
+                // Mostrar sección de edición
                 registroSection.style.display = 'none';
                 editarSection.style.display = 'block';
+                buscarPredicacionSection.style.display = 'none';
+                
+                // Actualizar estilos de los botones
                 registroBtn.classList.add('secondary');
                 registroBtn.classList.remove('primary');
                 editarBtn.classList.add('primary');
