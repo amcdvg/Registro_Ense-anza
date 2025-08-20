@@ -1,9 +1,9 @@
-const CACHE_NAME = 'registro-ensenanzas-cache-v1';
+const CACHE_NAME = 'predicaciones-cache-v2';
 const urlsToCache = [
   '/',
   '/index.html',
-  './manifest.json',
-  './calendar.png'
+  '/manifest.json',
+  '/calendar.png'
 ];
 
 // Instalación del Service Worker
@@ -11,7 +11,7 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
-        console.log('Cache abierto');
+        console.log('Opened cache');
         return cache.addAll(urlsToCache);
       })
   );
