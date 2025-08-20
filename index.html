@@ -1700,7 +1700,7 @@
                 });
             }
             
-            // Manejar envío del formulario
+                        // Manejar envío del formulario
             const enseñanzaForm = document.getElementById('enseñanzaForm');
             if (enseñanzaForm) {
                 enseñanzaForm.addEventListener('submit', async function(e) {
@@ -1726,12 +1726,6 @@
                         });
                         return;
                     }
-
-                    // Deshabilitar botón para evitar doble clic
-                    const submitBtn = this.querySelector('button[type="submit"]');
-                    const originalText = submitBtn.innerHTML;
-                    submitBtn.disabled = true;
-                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
 
                     try {
                         // Validación de predicación dominical
@@ -1838,11 +1832,7 @@
                             text: 'Ocurrió un problema al intentar guardar los datos. Por favor intente nuevamente.',
                             confirmButtonColor: '#4361ee'
                         });
-                    }finally {
-                    // Rehabilitar botón
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = originalText;
-                }
+                    }
                 });
             }
             
