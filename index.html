@@ -4,6 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro de Enseñanzas</title>
+    
+    <!-- ============================ -->
+    <!-- AÑADIDOS PARA PWA (COMIENZO) -->
+    <!-- ============================ -->
+    <meta name="theme-color" content="#4361ee">
+    <link rel="manifest" href="./manifest.json">
+    <link rel="icon" href="./calendar.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="./calendar.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Registro Enseñanzas">
+    <!-- ========================== -->
+    <!-- AÑADIDOS PARA PWA (FIN) -->
+    <!-- ========================== -->
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -324,9 +339,102 @@
         margin: 20px 0; /* Añade 20px de margen arriba y abajo */
         padding-top: 20px; /* Espacio adicional arriba si lo prefieres */
     }
+    
+    /* ============================ */
+    /* ESTILOS PWA (COMIENZO) */
+    /* ============================ */
+    .pwa-install-btn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        font-size: 24px;
+        cursor: pointer;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        display: none;
+        z-index: 1000;
+        transition: all 0.3s ease;
+    }
+    
+    .pwa-install-btn:hover {
+        background-color: var(--secondary-color);
+        transform: scale(1.1);
+    }
+    
+    /* Banner de instalación */
+    #pwa-install-banner {
+        display: none;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: #f8f9fa;
+        padding: 15px;
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        z-index: 1000;
+        text-align: center;
+        border-top: 3px solid var(--primary-color);
+    }
+    
+    #pwa-install-banner p {
+        margin: 0 0 10px 0;
+        font-size: 1rem;
+    }
+    
+    #pwa-install-accept {
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        margin-right: 10px;
+        cursor: pointer;
+    }
+    
+    #pwa-install-reject {
+        background: #6c757d;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    
+    /* Indicador de estado offline */
+    .offline-indicator {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background: var(--warning-color);
+        color: #000;
+        text-align: center;
+        padding: 10px;
+        z-index: 1001;
+        font-weight: 500;
+    }
+    /* ========================== */
+    /* ESTILOS PWA (FIN) */
+    /* ========================== */
     </style>
 </head>
 <body>
+    <!-- ============================ -->
+    <!-- ELEMENTOS PWA (COMIENZO) -->
+    <!-- ============================ -->
+    <div class="offline-indicator" id="offline-indicator">
+        <i class="fas fa-wifi"></i> Estás trabajando sin conexión
+    </div>
+    <!-- ========================== -->
+    <!-- ELEMENTOS PWA (FIN) -->
+    <!-- ========================== -->
+    
     <div class="container">
         <div class="form-header">
             <img src="./descarga.png" alt="Enseñanzas" class="header-image">
@@ -409,7 +517,7 @@
                     <h3><i class="fas fa-book-open"></i> Enseñanzas día Miércoles</h3>
                     
                     <div class="form-group">
-                        <label for="fechaEnseñanzaMiercoles">FECHA DE ENSEÑANZA - MIÉRCOLES</label>
+                        <label for="fechaEnseñanzaMiercoles">FECHA DE ENSEñANZA - MIÉRCOLES</label>
                         <i class="fas fa-calendar-day input-icon"></i>
                         <input type="date" id="fechaEnseñanzaMiercoles" class="form-control">
                         <div class="date-info" id="diaEnseñanzaMiercoles"></div>
@@ -490,7 +598,7 @@
             <h3><i class="fas fa-search"></i> Buscar Enseñanza por Número y Nombre</h3>
             <div class="edit-form">
                 <div class="form-group">
-                    <label for="buscarPredicacionInput">NÚMERO Y NOMBRE DE ENSEÑANZA</label>
+                    <label for="buscarPredicacionInput">NÚMERO Y NOMBRE DE ENSEñANZA</label>
                     <i class="fas fa-book input-icon"></i>
                     <input type="text" id="buscarPredicacionInput" class="form-control" placeholder="Ej: 1017 DIOS LE HABLA AL HOMBRE">
                 </div>
@@ -504,6 +612,22 @@
         </div>
     </div>
     
+    <!-- ============================ -->
+    <!-- ELEMENTOS PWA (COMIENZO) -->
+    <!-- ============================ -->
+    <button id="pwa-install-btn" class="pwa-install-btn" title="Instalar aplicación">
+        <i class="fas fa-download"></i>
+    </button>
+    
+    <!--div id="pwa-install-banner">
+        <p>¿Deseas instalar la aplicación para un acceso más rápido?</p>
+        <button id="pwa-install-accept">Instalar</button>
+        <button id="pwa-install-reject">Ahora no</button>
+    </div-->
+    <!-- ========================== -->
+    <!-- ELEMENTOS PWA (FIN) -->
+    <!-- ========================== -->
+    
     <div class="loading" id="loading">
         <div class="loading-content">
             <div class="spinner"></div>
@@ -512,8 +636,98 @@
     </div>
 
     <script>
+        // ============================
+        // CÓDIGO PWA (COMIENZO)
+        // ============================
+        // Registrar Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('./sw.js')
+                .then(function(registration) {
+                    console.log('ServiceWorker registrado con éxito: ', registration.scope);
+                })
+                .catch(function(error) {
+                    console.log('Error al registrar ServiceWorker: ', error);
+                });
+            });
+        }
+
+        // Detectar si la PWA se puede instalar
+        let deferredPrompt;
+        const installButton = document.getElementById('pwa-install-btn');
+        const installBanner = document.getElementById('pwa-install-banner');
+        const installAccept = document.getElementById('pwa-install-accept');
+        const installReject = document.getElementById('pwa-install-reject');
+        const offlineIndicator = document.getElementById('offline-indicator');
+        
+        // Detectar cambios en la conectividad
+        window.addEventListener('online', () => {
+            offlineIndicator.style.display = 'none';
+            console.log('Conectado a internet');
+        });
+        
+        window.addEventListener('offline', () => {
+            offlineIndicator.style.display = 'block';
+            console.log('Sin conexión a internet');
+        });
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevenir que el navegador muestre el prompt automáticamente
+            e.preventDefault();
+            // Guardar el evento para poder activarlo después
+            deferredPrompt = e;
+            // Mostrar el botón de instalación
+            installButton.style.display = 'block';
+            
+            // Mostrar banner después de un tiempo si no se ha rechazado antes
+            if (!localStorage.getItem('pwaBannerRejected')) {
+                setTimeout(() => {
+                    installBanner.style.display = 'block';
+                }, 5000);
+            }
+            
+            installButton.addEventListener('click', async () => {
+                // Ocultar el botón después de hacer clic
+                installButton.style.display = 'none';
+                installBanner.style.display = 'none';
+                // Mostrar el prompt de instalación
+                deferredPrompt.prompt();
+                // Esperar a que el usuario responda al prompt
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`User response to the install prompt: ${outcome}`);
+                // Ya no necesitamos el prompt, lo limpiamos
+                deferredPrompt = null;
+            });
+            
+            installAccept.addEventListener('click', async () => {
+                installBanner.style.display = 'none';
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`User response: ${outcome}`);
+                deferredPrompt = null;
+            });
+
+            installReject.addEventListener('click', () => {
+                installBanner.style.display = 'none';
+                // Guardar en localStorage para no mostrar de nuevo
+                localStorage.setItem('pwaBannerRejected', 'true');
+            });
+        });
+
+        window.addEventListener('appinstalled', () => {
+            // Ocultar el botón de instalación después de instalar
+            installButton.style.display = 'none';
+            installBanner.style.display = 'none';
+            // Limpiar el prompt guardado
+            deferredPrompt = null;
+            console.log('PWA was installed');
+        });
+        // ==========================
+        // CÓDIGO PWA (FIN)
+        // ==========================
+
         // Configuración de Google Sheets
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzUXR-hFiiVoXTp6gqrsXAMUgEpbC14NFhBnlKSiVzVRCaVM689Tjt5qEKqvbQfmHOM/exec'; // Reemplaza con tu URL de Apps Script
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyra4lydsBRVmf-kiJDUGtVWEKac8kIlAT5e1B4ezOsZME5gDGgeUYWcHsH_PG_Pbg2/exec'; // Reemplaza con tu URL de Apps Script
         
         // Función para mostrar loading
         function showLoading() {
@@ -661,6 +875,28 @@
                 console.error("Error al actualizar registro:", error);
                 hideLoading();
                 throw error;
+            }
+        }
+
+        // Función para verificar si las fechas ya existen en Google Sheets
+        async function verificarFechasExistentes(fechaDomingo, fechaMiercoles, fechaCulto) {
+            try {
+                showLoading();
+                
+                const response = await fetch(`${SCRIPT_URL}?action=verificarFechas&fechaDomingo=${fechaDomingo || ''}&fechaMiercoles=${fechaMiercoles || ''}&fechaCulto=${fechaCulto || ''}`);
+                
+                if (!response.ok) {
+                    throw new Error('Error al verificar fechas');
+                }
+                
+                const data = await response.json();
+                hideLoading();
+                
+                return data;
+            } catch (error) {
+                console.error("Error al verificar fechas:", error);
+                hideLoading();
+                return { existe: false, error: error.message };
             }
         }
 
@@ -1457,6 +1693,39 @@
                     }
 
                     try {
+                        // Verificar si las fechas ya existen
+                        const verificacionFechas = await verificarFechasExistentes(
+                            formData.fechaEnseñanzaDomingo,
+                            formData.fechaEnseñanzaMiercoles,
+                            formData.fechaCulto
+                        );
+                        
+                        if (verificacionFechas.existe) {
+                            let mensaje = 'Las siguientes fechas ya están registradas:<br><ul>';
+                            
+                            if (verificacionFechas.fechaDomingo) {
+                                mensaje += `<li>Domingo: ${verificacionFechas.fechaDomingo}</li>`;
+                            }
+                            
+                            if (verificacionFechas.fechaMiercoles) {
+                                mensaje += `<li>Miércoles: ${verificacionFechas.fechaMiercoles}</li>`;
+                            }
+                            
+                            if (verificacionFechas.fechaCulto) {
+                                mensaje += `<li>Culto Sábado: ${verificacionFechas.fechaCulto}</li>`;
+                            }
+                            
+                            mensaje += '</ul>No se puede registrar la misma fecha más de una vez.';
+                            
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Fechas duplicadas',
+                                html: mensaje,
+                                confirmButtonColor: '#4361ee'
+                            });
+                            return;
+                        }
+                        
                         // Validación de predicación dominical
                         // Validación de predicación domingo
                         if (formData.predicacionDomingo && formData.fechaEnseñanzaDomingo) {
