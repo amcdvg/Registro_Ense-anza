@@ -1702,86 +1702,49 @@
             
             // Manejar envío del formulario
             const enseñanzaForm = document.getElementById('enseñanzaForm');
-            let isSubmitting = false; // Flag para evitar doble envío
-
             if (enseñanzaForm) {
                 enseñanzaForm.addEventListener('submit', async function(e) {
                     e.preventDefault();
-
-                    // Prevenir doble envío
-                    if (isSubmitting) {
-                        console.warn("Formulario ya está siendo enviado. Evitando doble envío.");
+                    
+                    // Obtener datos del formulario
+                    const formData = {
+                        fechaEnseñanzaDomingo: document.getElementById('fechaEnseñanzaDomingo')?.value,
+                        predicacionDomingo: document.getElementById('predicacionDomingo')?.value,
+                        fechaEnseñanzaMiercoles: document.getElementById('fechaEnseñanzaMiercoles')?.value,
+                        predicacionMiercoles: document.getElementById('predicacionMiercoles')?.value,
+                        fechaCulto: document.getElementById('fechaCulto')?.value,
+                        horarioCulto: document.getElementById('horarioCulto')?.value,
+                    };
+                    
+                    // Validación básica de campos requeridos
+                    if (!formData.fechaCulto || !formData.horarioCulto) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Campos requeridos',
+                            text: 'Debe completar todos los campos obligatorios del formulario',
+                            confirmButtonColor: '#4361ee'
+                        });
                         return;
                     }
 
-                    isSubmitting = true; // Bloquear envíos múltiples
-                    const submitBtn = this.querySelector('button[type="submit"]');
-                    const originalText = submitBtn.innerHTML;
-                    submitBtn.disabled = true;
-                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
-
                     try {
-                        // Obtener datos del formulario
-                        const formData = {
-                            fechaEnseñanzaDomingo: document.getElementById('fechaEnseñanzaDomingo')?.value,
-                            predicacionDomingo: document.getElementById('predicacionDomingo')?.value,
-                            fechaEnseñanzaMiercoles: document.getElementById('fechaEnseñanzaMiercoles')?.value,
-                            predicacionMiercoles: document.getElementById('predicacionMiercoles')?.value,
-                            fechaCulto: document.getElementById('fechaCulto')?.value,
-                            horarioCulto: document.getElementById('horarioCulto')?.value,
-                        };
-
-                        // Validación básica
-                        if (!formData.fechaCulto || !formData.horarioCulto) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Campos requeridos',
-                                text: 'Debe completar todos los campos obligatorios del formulario',
-                                confirmButtonColor: '#4361ee'
-                            });
-                            return;
-                        }
-
-                        // Verificar fechas duplicadas
-                        const verificacionFechas = await verificarFechasExistentes(
-                            formData.fechaEnseñanzaDomingo,
-                            formData.fechaEnseñanzaMiercoles,
-                            formData.fechaCulto
-                        );
-                        if (verificacionFechas.existe) {
-                            let mensaje = 'Las siguientes fechas ya están registradas:<br><ul>';
-                            if (verificacionFechas.fechaDomingo) {
-                                mensaje += `<li>Domingo: ${verificacionFechas.fechaDomingo}</li>`;
-                            }
-                            if (verificacionFechas.fechaMiercoles) {
-                                mensaje += `<li>Miércoles: ${verificacionFechas.fechaMiercoles}</li>`;
-                            }
-                            if (verificacionFechas.fechaCulto) {
-                                mensaje += `<li>Culto Sábado: ${verificacionFechas.fechaCulto}</li>`;
-                            }
-                            mensaje += '</ul>No se puede registrar la misma fecha más de una vez.';
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Fechas duplicadas',
-                                html: mensaje,
-                                confirmButtonColor: '#4361ee'
-                            });
-                            return;
-                        }
-
-                        // Validaciones de predicación (domingo y miércoles)
+                        // Validación de predicación dominical
+                        // Validación de predicación domingo
                         if (formData.predicacionDomingo && formData.fechaEnseñanzaDomingo) {
+                            // Omitir validación si contiene el texto específico
                             if (!formData.predicacionDomingo.includes("Enseñanza con nuestra Hermana María Luisa")) {
                                 const validacionDom = await validarPredicacion(formData.predicacionDomingo, formData.fechaEnseñanzaDomingo, 'domingo');
                                 if (validacionDom.existe) {
                                     const confirmar = await Swal.fire({
                                         icon: 'warning',
                                         title: 'Enseñanza duplicada',
-                                        html: `<p>La enseñanza <strong>"${formData.predicacionDomingo}"</strong> ya fue predicada este año.</p>
+                                        html: `
+                                            <p>La enseñanza <strong>"${formData.predicacionDomingo}"</strong> ya fue predicada este año.</p>
                                             <p>Fechas anteriores: <ul style="padding-left: 20px; margin-top: 5px;">
                                                 ${validacionDom.fechas.map(fecha => `<li>${fecha}</li>`).join('')}
                                             </ul></p>
-                                            <p>¿Desea continuar con el registro?</p>`,
+                                            <p>¿Desea continuar con el registro?</p>
+                                        `,
                                         showCancelButton: true,
                                         confirmButtonColor: '#4361ee',
                                         cancelButtonColor: '#6c757d',
@@ -1793,18 +1756,22 @@
                             }
                         }
 
+                        // Validación de predicación miércoles
                         if (formData.predicacionMiercoles && formData.fechaEnseñanzaMiercoles) {
+                            // Omitir validación si contiene el texto específico
                             if (!formData.predicacionMiercoles.includes("Enseñanza con nuestra Hermana María Luisa")) {
                                 const validacionMier = await validarPredicacion(formData.predicacionMiercoles, formData.fechaEnseñanzaMiercoles, 'miercoles');
                                 if (validacionMier.existe) {
                                     const confirmar = await Swal.fire({
                                         icon: 'warning',
                                         title: 'Enseñanza duplicada',
-                                        html: `<p>La enseñanza <strong>"${formData.predicacionMiercoles}"</strong> ya fue predicada este año.</p>
+                                        html: `
+                                            <p>La enseñanza <strong>"${formData.predicacionMiercoles}"</strong> ya fue predicada este año.</p>
                                             <p>Fechas anteriores: <ul style="padding-left: 20px; margin-top: 5px;">
                                                 ${validacionMier.fechas.map(fecha => `<li>${fecha}</li>`).join('')}
                                             </ul></p>
-                                            <p>¿Desea continuar con el registro?</p>`,
+                                            <p>¿Desea continuar con el registro?</p>
+                                        `,
                                         showCancelButton: true,
                                         confirmButtonColor: '#4361ee',
                                         cancelButtonColor: '#6c757d',
@@ -1830,18 +1797,26 @@
                             `,
                             confirmButtonColor: '#4361ee',
                             willClose: () => {
+                                // Función segura para limpiar elementos
+                                const limpiarCampo = (id, propiedad, valor) => {
+                                    const elemento = document.getElementById(id);
+                                    if (elemento && elemento[propiedad] !== undefined) {
+                                        elemento[propiedad] = valor;
+                                    }
+                                };
+
                                 // Resetear formulario
-                                enseñanzaForm.reset();
-                                // Limpiar campos adicionales
-                                document.getElementById('diaEnseñanzaDomingo').textContent = '';
-                                document.getElementById('diaEnseñanzaMiercoles').textContent = '';
-                                document.getElementById('diaCulto').textContent = '';
-                                document.getElementById('statsPredicacionDomingo').style.display = 'none';
-                                document.getElementById('statsPredicacionMiercoles').style.display = 'none';
-                                document.getElementById('statsTextMiercoles').innerHTML = '';
-                                document.getElementById('statsTextDomingo').innerHTML = '';
+                                if (enseñanzaForm) enseñanzaForm.reset();
+
+                                // Limpiar campos específicos
+                                limpiarCampo('diaEnseñanzaDomingo', 'textContent', '');
+                                limpiarCampo('diaEnseñanzaMiercoles', 'textContent', '');
+                                limpiarCampo('diaCulto', 'textContent', '');
+                                limpiarCampo('statsPredicacionDomingo', 'style.display', 'none'); //document.getElementById('statsTextMiercoles')
+                                limpiarCampo('statsPredicacionMiercoles', 'style.display', 'none');
+                                document.getElementById('statsTextMiercoles').innerHTML = ''; 
+                                document.getElementById('statsTextDomingo').innerHTML = ''; 
                                 // Resetear selectores
-                                const selectWeek = document.getElementById('selectWeek');
                                 if (selectWeek) {
                                     selectWeek.disabled = true;
                                     selectWeek.innerHTML = '<option value="">Seleccione primero un mes</option>';
@@ -1857,13 +1832,6 @@
                             text: 'Ocurrió un problema al intentar guardar los datos. Por favor intente nuevamente.',
                             confirmButtonColor: '#4361ee'
                         });
-                    } finally {
-                        // Liberar el bloqueo y restaurar el botón
-                        isSubmitting = false;
-                        if (submitBtn) {
-                            submitBtn.disabled = false;
-                            submitBtn.innerHTML = originalText;
-                        }
                     }
                 });
             }
