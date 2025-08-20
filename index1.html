@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Enseñanzas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3a0ca3;
+            --accent-color: #f72585;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #4cc9f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .form-header {
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 25px;
+            text-align: center;
+            position: relative;
+        }
+
+        .form-header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .form-header i {
+            font-size: 40px;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .form-body {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark-color);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px 12px 45px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background-color: #f8f9fa;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+            outline: none;
+            background-color: white;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 38px;
+            color: var(--primary-color);
+            font-size: 18px;
+        }
+
+        .btn {
+            display: inline-block;
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover {
+            background: linear-gradient(to right, var(--secondary-color), var(--primary-color));
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn i {
+            margin-right: 8px;
+        }
+
+        .date-info {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 15px;
+            padding-right: 40px;
+        }
+
+        .stats-preview {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .stats-preview h4 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .stats-preview p {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .day-section {
+            background-color: rgba(67, 97, 238, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .day-section h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .day-section h3 i {
+            margin-right: 10px;
+        }
+
+        .month-week-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .month-week-selector .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .week-dates-info {
+            background-color: rgba(67, 97, 238, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 14px;
+            color: var(--dark-color);
+        }
+
+        .week-dates-info p {
+            margin: 5px 0;
+        }
+        
+        .loading {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .loading-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary-color);
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    .form-header {
+            position: relative;
+            text-align: center;
+        }
+
+    .header-image {
+            width: 180px; /* Ajusta el tamaño según necesites */
+            height: 180px;
+            margin-bottom: 15px;
+            object-fit: contain; /* Para mantener las proporciones */
+            border-radius: 50%; /* Opcional: para hacerla circular */
+            border: 3px solid white; /* Opcional: borde blanco */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Opcional: sombra */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!--div class="form-header">
+            <i class="fas fa-chalkboard-teacher"></i>
+            <h1>Cronograma de Enseñanzas</h1>
+            <p>Sistema de agendamiento de predicaciones</p>
+        </div-->
+        <div class="form-header">
+            <!-- Reemplaza el ícono por una imagen -->
+            <img src="./descarga.png" alt="Enseñanzas" class="header-image">
+            <h1>Cronograma de Enseñanzas</h1>
+            <p>Sistema de agendamiento de predicaciones</p>
+        </div>
+        <div class="form-body">
+            <form id="enseñanzaForm">
+                <!-- Selector de Mes y Semana -->
+                <div class="month-week-selector">
+                    <div class="form-group">
+                        <label for="selectMonth">MES</label>
+                        <i class="fas fa-calendar-alt input-icon"></i>
+                        <select id="selectMonth" class="form-control">
+                            <option value="">Seleccione un mes</option>
+                            <option value="0">Enero</option>
+                            <option value="1">Febrero</option>
+                            <option value="2">Marzo</option>
+                            <option value="3">Abril</option>
+                            <option value="4">Mayo</option>
+                            <option value="5">Junio</option>
+                            <option value="6">Julio</option>
+                            <option value="7">Agosto</option>
+                            <option value="8">Septiembre</option>
+                            <option value="9">Octubre</option>
+                            <option value="10">Noviembre</option>
+                            <option value="11">Diciembre</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="selectWeek">SEMANA DEL MES</label>
+                        <i class="fas fa-calendar-week input-icon"></i>
+                        <select id="selectWeek" class="form-control" disabled>
+                            <option value="">Seleccione primero un mes</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Sección para Domingo -->
+                <div class="day-section">
+                    <h3><i class="fas fa-book-open"></i> Enseñanzas día Domingo</h3>
+                    
+                    <div class="form-group">
+                        <label for="fechaEnseñanzaDomingo">FECHA DE ENSEÑANZA - DOMINGO</label>
+                        <i class="fas fa-calendar-day input-icon"></i>
+                        <input type="date" id="fechaEnseñanzaDomingo" class="form-control">
+                        <div class="date-info" id="diaEnseñanzaDomingo"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="predicacionDomingo">NÚMERO DE PREDICACIÓN Y TÍTULO - DOMINGO</label>
+                        <i class="fas fa-book input-icon"></i>
+                        <input type="text" id="predicacionDomingo" class="form-control" placeholder="Ej: 1017 DIOS LE HABLA ALHOMBRE">
+                        <div class="stats-preview" id="statsPredicacionDomingo">
+                            <h4><i class="fas fa-chart-bar"></i> Estadísticas de esta predicación</h4>
+                            <p id="statsTextDomingo"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sección para Miércoles -->
+                <div class="day-section">
+                    <h3><i class="fas fa-book-open"></i> Enseñanzas día Miércoles</h3>
+                    
+                    <div class="form-group">
+                        <label for="fechaEnseñanzaMiercoles">FECHA DE ENSEÑANZA - MIÉRCOLES</label>
+                        <i class="fas fa-calendar-day input-icon"></i>
+                        <input type="date" id="fechaEnseñanzaMiercoles" class="form-control">
+                        <div class="date-info" id="diaEnseñanzaMiercoles"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="predicacionMiercoles">NÚMERO DE PREDICACIÓN Y TÍTULO - MIÉRCOLES</label>
+                        <i class="fas fa-book input-icon"></i>
+                        <input type="text" id="predicacionMiercoles" class="form-control" placeholder="Ej: 1017 DIOS LE HABLA ALHOMBRE">
+                        <div class="stats-preview" id="statsPredicacionMiercoles">
+                            <h4><i class="fas fa-chart-bar"></i> Estadísticas de esta predicación</h4>
+                            <p id="statsTextMiercoles"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sección para Sábado -->
+                <div class="day-section">
+                    <h3><i class="fas fa-calendar-check"></i> Culto de Estudio Bíblico día Sábado</h3>
+                    
+                    <div class="form-group">
+                        <label for="fechaCulto">FECHA DEL CULTO DE ESTUDIO BÍBLICO</label>
+                        <i class="fas fa-calendar-check input-icon"></i>
+                        <input type="date" id="fechaCulto" class="form-control" required>
+                        <div class="date-info" id="diaCulto"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="horarioCulto">HORARIO DEL CULTO ENCARGADO</label>
+                        <i class="fas fa-clock input-icon"></i>
+                        <select id="horarioCulto" class="form-control" required>
+                            <option value="">Seleccione un horario</option>
+                            <option value="7:00 am">7:00 am</option>
+                            <option value="5:00 pm">5:00 pm</option>
+                            <option value="7:00 pm">7:00 pm</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn"><i class="fas fa-paper-plane"></i> Guardar Registro</button>
+            </form>
+        </div>
+    </div>
+    
+    <div class="loading" id="loading">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <p>Procesando, por favor espere...</p>
+        </div>
+    </div>
+
+    <script>
+        // Configuración de Google Sheets
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyUIDcvfO7jJN2RsTlJfHUXpX8AEUktct7fZdfszBKKfMuAEt7XnmgZCeYgo9s0Z6JL/exec'; // Reemplaza con tu URL de Apps Script
+        
+        // Función para mostrar loading
+        function showLoading() {
+            document.getElementById('loading').style.display = 'flex';
+        }
+        
+        // Función para ocultar loading
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+        
+        // Función para validar predicación en el año actual usando Google Sheets
+        async function validarPredicacion(predicacion, fecha, tipo) {
+            try {
+                if (!predicacion) return { existe: false };
+                
+                showLoading();
+                
+                // Extraer el año de la fecha
+                const fechaObj = new Date(fecha);
+                const añoActual = fechaObj.getFullYear();
+                
+                // Hacer la petición a Google Apps Script
+                const response = await fetch(`${SCRIPT_URL}?action=validarPredicacion&predicacion=${encodeURIComponent(predicacion)}&año=${añoActual}&tipo=${tipo}`);
+                
+                if (!response.ok) {
+                    throw new Error('Error al validar predicación');
+                }
+                
+                const data = await response.json();
+                
+                hideLoading();
+                
+                if (data.existe) {
+                    return {
+                        existe: true,
+                        count: data.count,
+                        fechas: data.fechas
+                    };
+                }
+                
+                return { existe: false };
+            } catch (error) {
+                console.error("Error al validar predicación:", error);
+                hideLoading();
+                return { existe: false, error: error.message };
+            }
+        }
+
+        // Función para guardar registro en Google Sheets
+        async function guardarRegistro(formData) {
+            try {
+                showLoading();
+                
+                // Preparar los datos para enviar
+                const dataToSend = {
+                    action: 'guardarRegistro',
+                    fechaEnseñanzaDomingo: formData.fechaEnseñanzaDomingo || '',
+                    predicacionDomingo: formData.predicacionDomingo || '',
+                    fechaEnseñanzaMiercoles: formData.fechaEnseñanzaMiercoles || '',
+                    predicacionMiercoles: formData.predicacionMiercoles || '',
+                    fechaCulto: formData.fechaCulto,
+                    horarioCulto: formData.horarioCulto
+                };
+                console.log(`data=${encodeURIComponent(JSON.stringify(dataToSend))}`)
+                // Hacer la petición POST a Google Apps Script
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `data=${encodeURIComponent(JSON.stringify(dataToSend))}`
+                });
+                
+                const result = await response.json();
+                
+                hideLoading();
+                return result;
+            } catch (error) {
+                console.error("Error al guardar registro:", error);
+                hideLoading();
+                throw error;
+            }
+        }
+
+        // Función para obtener el día de la semana correctamente considerando la zona horaria local
+        function getDiaSemanaLocal(fechaStr) {
+            if (!fechaStr) return '';
+            
+            const diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+            
+            // Dividir la fecha en partes (yyyy-mm-dd)
+            const partes = fechaStr.split('-');
+            if (partes.length !== 3) return '';
+            
+            const año = parseInt(partes[0]);
+            const mes = parseInt(partes[1]) - 1; // Los meses en JS son 0-11
+            const dia = parseInt(partes[2]);
+            
+            // Crear fecha en zona horaria local
+            const fechaLocal = new Date(año, mes, dia);
+            
+            // Obtener día de la semana (0-6)
+            const diaNum = fechaLocal.getDay();
+            
+            return diasSemana[diaNum];
+        }
+
+        // Función para formatear fecha como DD/MM/YYYY
+        function formatDate(date) {
+            if (!date || !(date instanceof Date)) return '';
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+
+        // Función para formatear fecha como YYYY-MM-DD (para inputs date)
+        function formatDateInput(date) {
+            if (!date || !(date instanceof Date)) return '';
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${year}-${month}-${day}`;
+        }
+
+        // Función para obtener las semanas de un mes
+        function getWeeksInMonth(month, year) {
+            const weeks = [];
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            
+            // Comenzar desde el domingo anterior al primer día del mes
+            let currentDate = new Date(firstDay);
+            while (currentDate.getDay() !== 0) {
+                currentDate.setDate(currentDate.getDate() - 1);
+            }
+            
+            // Generar semanas completas
+            while (currentDate <= lastDay || weeks.length === 0) {
+                const week = [];
+                for (let i = 0; i < 7; i++) {
+                    week.push(new Date(currentDate));
+                    currentDate.setDate(currentDate.getDate() + 1);
+                }
+                weeks.push(week);
+                
+                // Si hemos pasado el último día del mes, salir del bucle
+                if (currentDate.getMonth() > month && currentDate.getFullYear() >= year) {
+                    break;
+                }
+            }
+            
+            return weeks;
+        }
+
+        // Función para actualizar las fechas según la semana seleccionada
+        function updateDatesForWeek(weekDates) {
+            if (!weekDates || weekDates.length === 0) return;
+            
+            // Encontrar días específicos en la semana
+            let sunday = weekDates.find(date => date.getDay() === 0);
+            let wednesday = weekDates.find(date => date.getDay() === 3);
+            let saturday = weekDates.find(date => date.getDay() === 6);
+            
+            // Actualizar campos de fecha del formulario
+            const domingoInput = document.getElementById('fechaEnseñanzaDomingo');
+            const miercolesInput = document.getElementById('fechaEnseñanzaMiercoles');
+            const cultoInput = document.getElementById('fechaCulto');
+            const diaDomingo = document.getElementById('diaEnseñanzaDomingo');
+            const diaMiercoles = document.getElementById('diaEnseñanzaMiercoles');
+            const diaCulto = document.getElementById('diaCulto');
+            
+            if (domingoInput && diaDomingo) {
+                domingoInput.value = sunday ? formatDateInput(sunday) : '';
+                diaDomingo.textContent = sunday ? `Día: Domingo` : '';
+            }
+            
+            if (miercolesInput && diaMiercoles) {
+                miercolesInput.value = wednesday ? formatDateInput(wednesday) : '';
+                diaMiercoles.textContent = wednesday ? `Día: Miércoles` : '';
+            }
+            
+            if (cultoInput && diaCulto) {
+                cultoInput.value = saturday ? formatDateInput(saturday) : '';
+                diaCulto.textContent = saturday ? `Día: Sábado` : '';
+            }
+            
+            // Mostrar información de la semana seleccionada
+            const weekStart = weekDates[0];
+            const weekEnd = weekDates[weekDates.length - 1];
+            console.log(`Semana seleccionada: ${formatDate(weekStart)} - ${formatDate(weekEnd)}`);
+        }
+
+        // Configuración inicial
+        document.addEventListener('DOMContentLoaded', function() {
+            // Variables para almacenar las semanas del mes seleccionado
+            let currentWeeks = [];
+            let currentYear = new Date().getFullYear();
+            
+            // Manejar cambio de mes
+            const selectMonth = document.getElementById('selectMonth');
+            const selectWeek = document.getElementById('selectWeek');
+            
+            if (selectMonth) {
+                selectMonth.addEventListener('change', function() {
+                    const month = parseInt(this.value);
+                    
+                    if (selectWeek) {
+                        if (isNaN(month)) {
+                            selectWeek.disabled = true;
+                            selectWeek.innerHTML = '<option value="">Seleccione primero un mes</option>';
+                            
+                            // Limpiar campos de fecha
+                            const domingoInput = document.getElementById('fechaEnseñanzaDomingo');
+                            const miercolesInput = document.getElementById('fechaEnseñanzaMiercoles');
+                            const cultoInput = document.getElementById('fechaCulto');
+                            const diaDomingo = document.getElementById('diaEnseñanzaDomingo');
+                            const diaMiercoles = document.getElementById('diaEnseñanzaMiercoles');
+                            const diaCulto = document.getElementById('diaCulto');
+                            
+                            if (domingoInput) domingoInput.value = '';
+                            if (miercolesInput) miercolesInput.value = '';
+                            if (cultoInput) cultoInput.value = '';
+                            if (diaDomingo) diaDomingo.textContent = '';
+                            if (diaMiercoles) diaMiercoles.textContent = '';
+                            if (diaCulto) diaCulto.textContent = '';
+                            return;
+                        }
+                        
+                        currentWeeks = getWeeksInMonth(month, currentYear);
+                        
+                        // Actualizar selector de semanas
+                        selectWeek.innerHTML = '';
+                        selectWeek.disabled = false;
+                        
+                        currentWeeks.forEach((week, index) => {
+                            const weekStart = week[0];
+                            const weekEnd = week[week.length - 1];
+                            
+                            const option = document.createElement('option');
+                            option.value = index;
+                            option.textContent = `Semana ${index + 1} (${formatDate(weekStart)} - ${formatDate(weekEnd)})`;
+                            selectWeek.appendChild(option);
+                        });
+                        
+                        // Seleccionar la semana actual si existe, de lo contrario seleccionar la primera semana
+                        const today = new Date();
+                        let weekSelected = false;
+                        
+                        if (today.getMonth() === month && today.getFullYear() === currentYear) {
+                            for (let i = 0; i < currentWeeks.length; i++) {
+                                const week = currentWeeks[i];
+                                if (today >= week[0] && today <= week[week.length - 1]) {
+                                    selectWeek.value = i;
+                                    updateDatesForWeek(week);
+                                    weekSelected = true;
+                                    break;
+                                }
+                            }
+                        }
+                        
+                        // Si no se encontró la semana actual, seleccionar la primera semana
+                        if (!weekSelected && currentWeeks.length > 0) {
+                            selectWeek.value = 0;
+                            updateDatesForWeek(currentWeeks[0]);
+                        }
+                    }
+                });
+            }
+            
+            // Manejar cambio de semana
+            if (selectWeek) {
+                selectWeek.addEventListener('change', function() {
+                    const weekIndex = parseInt(this.value);
+                    if (isNaN(weekIndex)) return;
+                    
+                    if (weekIndex >= 0 && weekIndex < currentWeeks.length) {
+                        updateDatesForWeek(currentWeeks[weekIndex]);
+                    }
+                });
+            }
+            
+            // Mostrar día de la semana para fecha de enseñanza domingo
+            const fechaDomingo = document.getElementById('fechaEnseñanzaDomingo');
+            if (fechaDomingo) {
+                fechaDomingo.addEventListener('change', function() {
+                    const diaElement = document.getElementById('diaEnseñanzaDomingo');
+                    if (!diaElement) return;
+                    
+                    if (this.value) {
+                        const dia = getDiaSemanaLocal(this.value);
+                        diaElement.textContent = `Día: ${dia}`;
+                        
+                        // Validar que sea domingo
+                        if (dia !== 'Domingo') {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Atención',
+                                text: 'La fecha seleccionada no es un domingo',
+                                confirmButtonColor: '#4361ee'
+                            });
+                        }
+                    } else {
+                        diaElement.textContent = '';
+                    }
+                });
+            }
+            
+            // Mostrar día de la semana para fecha de enseñanza miércoles
+            const fechaMiercoles = document.getElementById('fechaEnseñanzaMiercoles');
+            if (fechaMiercoles) {
+                fechaMiercoles.addEventListener('change', function() {
+                    const diaElement = document.getElementById('diaEnseñanzaMiercoles');
+                    if (!diaElement) return;
+                    
+                    if (this.value) {
+                        const dia = getDiaSemanaLocal(this.value);
+                        diaElement.textContent = `Día: ${dia}`;
+                        
+                        // Validar que sea miércoles
+                        if (dia !== 'Miércoles') {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Atención',
+                                text: 'La fecha seleccionada no es un miércoles',
+                                confirmButtonColor: '#4361ee'
+                            });
+                        }
+                    } else {
+                        diaElement.textContent = '';
+                    }
+                });
+            }
+            
+            // Mostrar día de la semana real para fecha de culto
+            const fechaCulto = document.getElementById('fechaCulto');
+            if (fechaCulto) {
+                fechaCulto.addEventListener('change', function() {
+                    const diaElement = document.getElementById('diaCulto');
+                    if (!diaElement) return;
+                    
+                    if (this.value) {
+                        const dia = getDiaSemanaLocal(this.value);
+                        diaElement.textContent = `Día: ${dia}`;
+                        
+                        // Validar que sea sábado
+                        if (dia !== 'Sábado') {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Atención',
+                                text: 'La fecha seleccionada no es un sábado',
+                                confirmButtonColor: '#4361ee'
+                            });
+                        }
+                    } else {
+                        diaElement.textContent = '';
+                    }
+                });
+            }
+            
+            // Verificar predicación domingo en Google Sheets
+// Verificar predicación domingo en Google Sheets
+const predicacionDomingo = document.getElementById('predicacionDomingo');
+if (predicacionDomingo) {
+    predicacionDomingo.addEventListener('blur', async function() {
+        const predicacion = this.value.trim();
+        const fechaInput = document.getElementById('fechaEnseñanzaDomingo');
+        const fecha = fechaInput ? fechaInput.value : '';
+        
+        if (predicacion && fecha) {
+            try {
+                // Definir las dos expresiones regulares a comparar
+                const regexEnsenanza = /Enseñanza con nuestra Hermana Mar[ií]a Luisa/i;
+               
+                // Validar solo si NO coincide con NINGUNA de las dos regex
+                if (!regexEnsenanza.test(predicacion) ) {
+                    const validacion = await validarPredicacion(predicacion, fecha, 'ambos');
+                    
+                    const statsDiv = document.getElementById('statsPredicacionDomingo');
+                    const statsText = document.getElementById('statsTextDomingo');
+                    
+                    if (statsDiv && statsText) {
+                        if (validacion.existe) {
+                            statsText.innerHTML = `
+                                Esta enseñanza se ha predicado <strong>${validacion.count} veces</strong> este año.<br>
+                                Fechas anteriores:<ul style="margin-top:5px; padding-left:20px;">
+                                    ${validacion.fechas.map(fecha => `<li>${fecha}</li>`).join('')}
+                                </ul>
+                            `;
+                            statsDiv.style.display = 'block';
+                            
+                            // Mostrar advertencia si ya existe
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Enseñanza predicada anteriormente',
+                                html: `
+                                    <p>La enseñanza <strong>"${predicacion}"</strong> ya ha sido predicada este año.</p>
+                                    <p>Fechas anteriores:</p>
+                                    <ul style="padding-left: 20px; margin: 5px 0;">
+                                        ${validacion.fechas.map(fecha => `<li>${fecha}</li>`).join('')}
+                                    </ul>
+                                `,
+                                confirmButtonColor: '#4361ee'
+                            });
+                        } else {
+                            statsText.textContent = 'Esta es la primera vez que se registra esta predicación este año.';
+                            statsDiv.style.display = 'block';
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error al verificar predicación dominical:', error);
+            }
+        }
+    });
+}
+
+// Verificar predicación miércoles (similar al anterior)
+const predicacionMiercoles = document.getElementById('predicacionMiercoles');
+if (predicacionMiercoles) {
+    predicacionMiercoles.addEventListener('blur', async function() {
+        const predicacion = this.value.trim();
+        const fechaInput = document.getElementById('fechaEnseñanzaMiercoles');
+        const fecha = fechaInput ? fechaInput.value : '';
+        
+        if (predicacion && fecha) {
+            try {
+                const regexEnsenanza = /Enseñanza con nuestra Hermana Mar[ií]a Luisa/i;
+                 // Cambia esto por tu segunda regex
+                
+                if (!regexEnsenanza.test(predicacion)) {
+                    const validacion = await validarPredicacion(predicacion, fecha, 'ambos');
+                    
+                    const statsDiv = document.getElementById('statsPredicacionMiercoles');
+                    const statsText = document.getElementById('statsTextMiercoles');
+                    
+                    if (statsDiv && statsText) {
+                        if (validacion.existe) {
+                            statsText.innerHTML = `
+                                Esta enseñanza se ha predicado <strong>${validacion.count} veces</strong> este año (sumando domingos y miércoles).<br>
+                                Fechas anteriores:<ul style="margin-top:5px; padding-left:20px;">
+                                    ${validacion.fechas.map(fecha => `<li>${fecha}</li>`).join('')}
+                                </ul>
+                            `;
+                            statsDiv.style.display = 'block';
+                            
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Enseñanza predicada anteriormente',
+                                html: `
+                                    <p>La enseñanza <strong>"${predicacion}"</strong> ya ha sido predicada este año (sumando domingos y miércoles).</p>
+                                    <p>Fechas anteriores:</p>
+                                    <ul style="padding-left: 20px; margin: 5px 0;">
+                                        ${validacion.fechas.map(fecha => `<li>${fecha}</li>`).join('')}
+                                    </ul>
+                                `,
+                                confirmButtonColor: '#4361ee'
+                            });
+                        } else {
+                            statsText.textContent = 'Esta es la primera vez que se registra esta enseñanza este año.';
+                            statsDiv.style.display = 'block';
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error al verificar predicación:', error);
+            }
+        }
+    });
+}
+            
+            // Manejar envío del formulario
+            const enseñanzaForm = document.getElementById('enseñanzaForm');
+            if (enseñanzaForm) {
+                enseñanzaForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    // Obtener datos del formulario
+                    const formData = {
+                        fechaEnseñanzaDomingo: document.getElementById('fechaEnseñanzaDomingo')?.value,
+                        predicacionDomingo: document.getElementById('predicacionDomingo')?.value,
+                        fechaEnseñanzaMiercoles: document.getElementById('fechaEnseñanzaMiercoles')?.value,
+                        predicacionMiercoles: document.getElementById('predicacionMiercoles')?.value,
+                        fechaCulto: document.getElementById('fechaCulto')?.value,
+                        horarioCulto: document.getElementById('horarioCulto')?.value,
+                    };
+                    
+                    // Validación básica de campos requeridos
+                    if (!formData.fechaCulto || !formData.horarioCulto) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Campos requeridos',
+                            text: 'Debe completar todos los campos obligatorios del formulario',
+                            confirmButtonColor: '#4361ee'
+                        });
+                        return;
+                    }
+
+                    try {
+                        // Validación de predicación dominical
+                        // Validación de predicación domingo
+                        if (formData.predicacionDomingo && formData.fechaEnseñanzaDomingo) {
+                            // Omitir validación si contiene el texto específico
+                            if (!formData.predicacionDomingo.includes("Enseñanza con nuestra Hermana María Luisa")) {
+                                const validacionDom = await validarPredicacion(formData.predicacionDomingo, formData.fechaEnseñanzaDomingo, 'domingo');
+                                if (validacionDom.existe) {
+                                    const confirmar = await Swal.fire({
+                                        icon: 'warning',
+                                        title: 'Enseñanza duplicada',
+                                        html: `
+                                            <p>La enseñanza <strong>"${formData.predicacionDomingo}"</strong> ya fue predicada este año.</p>
+                                            <p>Fechas anteriores: <ul style="padding-left: 20px; margin-top: 5px;">
+                                                ${validacionDom.fechas.map(fecha => `<li>${fecha}</li>`).join('')}
+                                            </ul></p>
+                                            <p>¿Desea continuar con el registro?</p>
+                                        `,
+                                        showCancelButton: true,
+                                        confirmButtonColor: '#4361ee',
+                                        cancelButtonColor: '#6c757d',
+                                        confirmButtonText: 'Guardar igual',
+                                        cancelButtonText: 'Cancelar'
+                                    });
+                                    if (!confirmar.isConfirmed) return;
+                                }
+                            }
+                        }
+
+                        // Validación de predicación miércoles
+                        if (formData.predicacionMiercoles && formData.fechaEnseñanzaMiercoles) {
+                            // Omitir validación si contiene el texto específico
+                            if (!formData.predicacionMiercoles.includes("Enseñanza con nuestra Hermana María Luisa")) {
+                                const validacionMier = await validarPredicacion(formData.predicacionMiercoles, formData.fechaEnseñanzaMiercoles, 'miercoles');
+                                if (validacionMier.existe) {
+                                    const confirmar = await Swal.fire({
+                                        icon: 'warning',
+                                        title: 'Enseñanza duplicada',
+                                        html: `
+                                            <p>La enseñanza <strong>"${formData.predicacionMiercoles}"</strong> ya fue predicada este año.</p>
+                                            <p>Fechas anteriores: <ul style="padding-left: 20px; margin-top: 5px;">
+                                                ${validacionMier.fechas.map(fecha => `<li>${fecha}</li>`).join('')}
+                                            </ul></p>
+                                            <p>¿Desea continuar con el registro?</p>
+                                        `,
+                                        showCancelButton: true,
+                                        confirmButtonColor: '#4361ee',
+                                        cancelButtonColor: '#6c757d',
+                                        confirmButtonText: 'Guardar igual',
+                                        cancelButtonText: 'Cancelar'
+                                    });
+                                    if (!confirmar.isConfirmed) return;
+                                }
+                            }
+                        }
+
+                        // Guardar en Google Sheets
+                        const resultado = await guardarRegistro(formData);
+
+                        // Mostrar confirmación
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Registro exitoso',
+                            html: `
+                                <p>Los datos se guardaron correctamente</p>
+                                ${formData.predicacionDomingo ? `<p><strong>Domingo:</strong> ${formData.predicacionDomingo}</p>` : ''}
+                                ${formData.predicacionMiercoles ? `<p><strong>Miércoles:</strong> ${formData.predicacionMiercoles}</p>` : ''}
+                            `,
+                            confirmButtonColor: '#4361ee',
+                            willClose: () => {
+                                // Función segura para limpiar elementos
+                                const limpiarCampo = (id, propiedad, valor) => {
+                                    const elemento = document.getElementById(id);
+                                    if (elemento && elemento[propiedad] !== undefined) {
+                                        elemento[propiedad] = valor;
+                                    }
+                                };
+
+                                // Resetear formulario
+                                if (enseñanzaForm) enseñanzaForm.reset();
+
+                                // Limpiar campos específicos
+                                limpiarCampo('diaEnseñanzaDomingo', 'textContent', '');
+                                limpiarCampo('diaEnseñanzaMiercoles', 'textContent', '');
+                                limpiarCampo('diaCulto', 'textContent', '');
+                                limpiarCampo('statsPredicacionDomingo', 'style.display', 'none'); //document.getElementById('statsTextMiercoles')
+                                limpiarCampo('statsPredicacionMiercoles', 'style.display', 'none');
+                                document.getElementById('statsTextMiercoles').innerHTML = ''; 
+                                document.getElementById('statsTextDomingo').innerHTML = ''; 
+                                // Resetear selectores
+                                if (selectWeek) {
+                                    selectWeek.disabled = true;
+                                    selectWeek.innerHTML = '<option value="">Seleccione primero un mes</option>';
+                                }
+                            }
+                        });
+
+                    } catch (error) {
+                        console.error('Error en el proceso:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error al guardar',
+                            text: 'Ocurrió un problema al intentar guardar los datos. Por favor intente nuevamente.',
+                            confirmButtonColor: '#4361ee'
+                        });
+                    }
+                });
+            }
+            
+            // Seleccionar el mes actual por defecto
+            if (selectMonth) {
+                const currentMonth = new Date().getMonth();
+                selectMonth.value = currentMonth;
+                selectMonth.dispatchEvent(new Event('change'));
+            }
+        });
+    </script>
+</body>
+</html>
