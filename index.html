@@ -1727,6 +1727,12 @@
                         return;
                     }
 
+                    // Deshabilitar botón para evitar doble clic
+                    const submitBtn = this.querySelector('button[type="submit"]');
+                    const originalText = submitBtn.innerHTML;
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+
                     try {
                         // Validación de predicación dominical
                         // Validación de predicación domingo
@@ -1832,7 +1838,11 @@
                             text: 'Ocurrió un problema al intentar guardar los datos. Por favor intente nuevamente.',
                             confirmButtonColor: '#4361ee'
                         });
-                    }
+                    }finally {
+                    // Rehabilitar botón
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                }
                 });
             }
             
